@@ -1,50 +1,43 @@
-library(plyr)
-
+library(dplyr)
 shrooms <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data", sep = ",")
 
 colnames(shrooms) <- c("Edible", "CapShape", "CapSurface", "CapColor", "Bruises", "Odor", "GillAtt", "GillSpacing",
                        "GillSize", "GillColor", "StalkShape", "StalkRoot", "StalkSurfaceAboveRing",
-                       "StalkSurface BelowRing", "StalkColor AboveRing", "StalkColorBelowRing", "VeilType",
+                       "StalkSurfaceBelowRing", "StalkColorAboveRing", "StalkColorBelowRing", "VeilType",
                        "VeilColor", "RingNumber", "RingType", "SporePrintColor", "Population", "Habitat")
 str(shrooms)
 head(shrooms)
 
 # change values in column
-shrooms$Edible <-  as.character(shrooms$Edible)
-shrooms$Edible[shrooms$Edible == "e"] <- "edible"
-shrooms$Edible[shrooms$Edible == "p"] <- "poisonous"
+#shrooms$Edible <-  as.character(shrooms$Edible)
+#shrooms$Edible[shrooms$Edible == "e"] <- "edible"
+#shrooms$Edible[shrooms$Edible == "p"] <- "poisonous"
 
-
-#$Cap Shape               : Factor w/ 6 levels
-shrooms$CapShape <-  as.character(shrooms$CapShape)
-shrooms$CapShape[shrooms$CapShape == "b"] <- "bell"
-shrooms$CapShape[shrooms$CapShape == "c"] <- "conical"
-shrooms$CapShape[shrooms$CapShape == "f"] <- "flat"
-shrooms$CapShape[shrooms$CapShape == "k"] <- "knobbed"
-shrooms$CapShape[shrooms$CapShape == "s"] <- "sunken"
-shrooms$CapShape[shrooms$CapShape == "x"] <- "convex"
-levels(shrooms$`Cap Shape`)
-
-#$ Cap Surface             : Factor w/ 4 levels 
-levels(shrooms$`Cap Shape`)
-shrooms$`Cap Shape` <-  as.character(shrooms$`Cap Shape`)
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "b"] <- "bell"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "c"] <- "conical"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "f"] <- "flat"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "k"] <- "knobbed"
-
-#$ Cap Color               : Factor w/ 10 levels 
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "b"] <- "bell"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "c"] <- "conical"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "f"] <- "flat"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "k"] <- "knobbed"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "b"] <- "bell"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "c"] <- "conical"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "f"] <- "flat"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "k"] <- "knobbed"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "b"] <- "bell"
-shrooms$`Cap Shape`[shrooms$`Cap Shape` == "c"] <- "conical"
-
+#reassigned items to legible informationdplyr
+shrooms$Edible <- shrooms$Edible %>% recode("e"="edible", "p"="poinsonous")
+shrooms$CapShape <- shrooms$CapShape %>% recode("b"="bell", "c"="conical", "f"="flat",
+                                                "k"="knobbed", "s"="sunken","x"="convex")
+shrooms$CapSurface <- shrooms$CapSurface %>% recode()
+shrooms$CapColor <- shrooms$CapColor %>% recode()
+shrooms$Bruises <- shrooms$Bruises %>% recode()
+shrooms$Odor <- shrooms$Odor %>% recode()
+shrooms$GillAtt <- shrooms$GillAtt %>% recode()
+shrooms$GillSpacing <- shrooms$GillSpacing %>% recode()
+shrooms$GillSize <- shrooms$GillSize %>% recode()
+shrooms$GillColor <- shrooms$GillColor %>% recode()
+shrooms$StalkShape <- shrooms$StalkShape %>% recode()
+shrooms$StalkRoot <- shrooms$StalkRoot %>% recode()
+shrooms$StalkSurfaceBelowRing <- shrooms$StalkSurfaceBelowRing %>% recode()
+shrooms$StalkSurfaceAboveRing <- shrooms$StalkSurfaceAboveRing %>% recode()
+shrooms$StalkColorBelowRing <- shrooms$StalkColorBelowRing %>% recode()
+shrooms$StalkColorAboveRing <- shrooms$StalkColorAboveRing %>% recode()
+shrooms$VeilType <- shrooms$VeilType %>% recode()
+shrooms$VeilColor <- shrooms$VeilColor %>% recode()
+shrooms$RingNumber <- shrooms$RingNumber %>% recode()
+shrooms$RingType <- shrooms$RingType %>% recode()
+shrooms$SporePrintColor <- shrooms$SporePrintColor %>% recode()
+shrooms$Population <- shrooms$Population %>% recode()
+shrooms$Habitat <- shrooms$Habitat %>% recode()
 
 #$ Bruises                 : Factor w/ 2 levels 
 #$ Odor                    : Factor w/ 9 levels 
