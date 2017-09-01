@@ -1,5 +1,6 @@
 library(dplyr)
-shrooms <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data", sep = ",")
+shrooms <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data", 
+                    sep = ",", header = FALSE)
 
 colnames(shrooms) <- c("Edible", "CapShape", "CapSurface", "CapColor", "Bruises", "Odor", "GillAtt", "GillSpacing",
                        "GillSize", "GillColor", "StalkShape", "StalkRoot", "StalkSurfaceAboveRing",
