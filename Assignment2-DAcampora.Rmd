@@ -1,0 +1,31 @@
+---
+title: "Assignment 2 - SQL and R"
+author: "Michael D'Acampora"
+date: "September 7, 2017"
+output: pdf_document
+---
+
+##### Import Libraries
+```{r}
+library(dplyr)
+library(RMySQL)
+library(pool)
+```
+
+##### Connect to MySQL database
+```{r}
+movie_rate_db <- dbPool(
+  RMySQL::MySQL(),
+  dbname = 'ratemovie',
+  host = 'localhost',
+  username = 'root',
+  password = '*******'
+  
+)
+```
+
+##### Get the first 6 rows, or in this case, the whole table
+```{r}
+movie_rate_db %>% tbl("ratings") %>% head(6)
+```
+
