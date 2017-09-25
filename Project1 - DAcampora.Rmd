@@ -1,0 +1,112 @@
+---
+title: "Project 1 - Chess Tournament Table"
+author: "Michael D'Acampora"
+date: "September 24, 2017"
+output: html_document
+---
+
+```{r}
+library(stringr)
+
+data <- "tournamentinfo.txt"
+
+dat <- readLines(data)
+
+head(dat, 33)
+```
+
+Split the file into two tables by odd and even rows with the sequence function.
+```{r}
+chessA <- dat[seq(5,195,3)]
+head(chessA, 10)
+```
+
+```{r}
+chessB <- dat[seq(6,196,3)]
+head(chessB, 10)
+```
+
+Extract the name using str_extract_all on the odd rows. Use unlist to vectorize the output and str_trim to clean up the empty space.
+```{r}
+name <- str_trim(unlist(str_extract_all(chessA,'[A-Z]+ [A-Z]+ ([A-Z-]+)? ([A-Z]+)?')))
+head(name, 10)
+```
+
+Extract the total pts using str_extract_all on the odd rows. Use unlist to vectorize the output and make it numeric.
+```{r}
+total <- as.numeric(unlist(str_extract_all(chessA, "\\d\\.\\d")))
+head(total, 10)
+```
+
+Extract the state using str_extract_all on the even rows. Use unlist to vectorize the output and use str_trim to clean up the empty space.
+```{r}
+state <- str_trim(unlist(str_extract_all(chessB, "\\s[A-Z]{2}\\ ")))
+head(state, 10)
+```
+
+Extract the player prerating using str_extract_all. Use unlist to vectorize the output.
+Complete a second pass of clean up and make it numeric. 
+
+```{r}
+prerate <- unlist(str_extract_all(chessB, ":\\s+\\d{3,4}"))
+prerate <- as.numeric(unlist(str_extract_all(prerate, "\\d{1,4}")))
+head(prerate, 10)
+```
+
+Describing the for loop:
+
+The tables have 64 rows. For each row:
+
+step 1: extract the W,D, or L and opponent number from each row 
+
+step 2: clean up the W,D, or L and spacing using str_replace, and make number numeric
+
+step 3: extract the player rating of the row number assigned to each of the values of step 2
+
+step 4: clean up the extraction with str_replace_all and make opponent ratings numeric
+
+step 5: sum up the row of opponent ratings and divide by the amount of opponents
+
+```{r}
+
+opp.rate <- vector()
+
+for (i in 1:64){
+  
+  s1 <- unlist(str_extract_all(chessA[i], "(W|D|L)\\s+(\\d)+"))
+  
+  s2 <- as.numeric(str_replace_all(s1, "(W|D|L)\\s+", ""))
+  
+  s3 <- str_extract(chessB[s2[1:length(s2)]], ":\\s+\\d{3,4}")
+  
+  s4 <- as.numeric(str_replace_all(s3, ":\\s+", ""))
+  
+  s5 <- round(sum(s4)/length(s4))
+  
+  opp.rate <- c(opp.rate, s5)
+}
+
+head(opp.rate, 10)
+```
+
+Create a data frame with the five columns created above
+```{r}
+
+chess_df <- data.frame(
+                      PlayerName = name, 
+                      State = state, 
+                      TotalPts = total, 
+                      AvgPrerating = prerate,                         
+                      OppAvgPrerating = opp.rate
+            )
+
+chess_df
+```
+
+Write to csv and remove the row numbers
+```{r}
+write.csv(chess_df, file = "tournamenttable.csv", row.names = FALSE)
+```
+
+
+
