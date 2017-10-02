@@ -1,0 +1,78 @@
+---
+title: "Assignment 5"
+author: "Michael D'Acampora"
+date: "October 1, 2017"
+output: html_document
+---
+```{r}
+library(tidyr)
+library(dplyr)
+
+flt <- read.csv("Assignment5.csv", na.strings = "")
+flt
+```
+
+Use tidyr and dplyr to clean up the table in one fell swoop, and add a column showing on-time performance percentage.
+```{r}
+tidy.flt <- flt %>% 
+  
+  drop_na(Los.Angeles) %>% 
+  
+  rename("Airline"=ï.., "Status"=X) %>% 
+
+  fill(Airline) %>% 
+  
+  gather(City, No.Flights, Los.Angeles:Seattle) %>%
+  
+  spread(Status, No.Flights) %>% 
+  
+  rename("Delayed"=delayed, "On.Time"= "on time") %>% 
+  
+  mutate(PercentOn.Time = round(
+                              (On.Time / (On.Time + Delayed))*100,1))
+
+tidy.flt
+
+```
+
+See total flights for each airline
+```{r}
+tidy.flt %>% 
+  group_by(Airline) %>%  
+  
+  summarise(Total.Flights = sum(Delayed) + sum(On.Time))
+
+```
+
+See total on-time flights for each airline
+```{r}
+tidy.flt %>% 
+  group_by(Airline) %>% 
+  
+  summarise(On.Time = sum(On.Time))
+
+
+```
+
+See total delayed flights for each airline
+```{r}
+tidy.flt %>% 
+  group_by(Airline) %>% 
+  
+  summarise(Delayed = sum(Delayed))
+
+
+```
+
+Grab the weighted average of on-time performance to see which airline has been better overall.
+
+At first I only averaged the OnTimePerformance percentages by City and Alaska Airlines actually looked like it had better on-time performance. However, since weighted average is better suited and since AM West was so strong and voluminous in Phoenix (92.1%), it pulled their weighted average up. 
+
+It also appears that Alaska Airlines had one of their worst on-time performances in Seattle, which had more than triple the number of flights compared to the other citys where the company flew.
+```{r}
+tidy.flt %>% 
+  group_by(Airline) %>% 
+  
+  summarise(AvgPercentOnTime = round(sum(On.Time) / sum(sum(On.Time)+sum(Delayed))*100,1))
+```
+
