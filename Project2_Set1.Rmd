@@ -1,0 +1,88 @@
+---
+title: "Project2 Dataset 1"
+author: "Michael D'Acampora"
+date: "October 7, 2017"
+output: html_document
+---
+#### Import libraries and pull a 30-row head 
+```{r}
+library(tidyr)
+library(dplyr)
+
+data <- read.csv("Energy Consumption.csv")
+
+head(data,30)
+```
+
+
+#### This step took a while because I had a number of error messages when I was trying to add numbers together. The trick appeared to remove the commas from the numbers and use as.numeric(). I performed this for all the rows I wanted to use in the table.
+
+#### Afterwards, I named a new variable energy where I used dplyr to pipe in steps, first by selecting the relevant variables, grouping by the agency name, and getting the summation of each of the fuel types. Since this first resulted in NAs all over the place, I substituted NA with 0. Normally a bad idea but I think it is ok with this data set.
+```{r}
+data$Bio.Diesel              <-  as.numeric(gsub(",", "", data$Bio.Diesel))
+data$C.Natural.Gas           <-  as.numeric(gsub(",", "", data$C.Natural.Gas))
+data$Diesel.Fuel             <-  as.numeric(gsub(",", "", data$Diesel.Fuel))
+data$Electric.Battery        <-  as.numeric(gsub(",", "", data$Electric.Battery))
+data$Electric.Propulsion     <-  as.numeric(gsub(",", "", data$Electric.Propulsion))
+data$Ethanol                 <-  as.numeric(gsub(",", "", data$Ethanol))
+data$Gasoline                <-  as.numeric(gsub(",", "", data$Gasoline))
+data$Hydrogen                <-  as.numeric(gsub(",", "", data$Hydrogen))
+data$Liquified.Nat.Gas       <-  as.numeric(gsub(",", "", data$Liquified.Nat.Gas))
+data$Liquified.Petroleum.Gas <-  as.numeric(gsub(",", "", data$Liquified.Petroleum.Gas))
+
+energy <- data %>% 
+  
+  select(Agency.Name,
+         Mode,
+         TOS,
+         Bio.Diesel,
+         C.Natural.Gas,
+         Diesel.Fuel,
+         Electric.Battery,
+         Electric.Propulsion,
+         Ethanol,
+         Gasoline,
+         Hydrogen,
+         Liquified.Nat.Gas,
+         Liquified.Petroleum.Gas)  %>% 
+             
+  group_by(Agency.Name) %>% 
+  
+  summarise(Diesel = sum(Diesel.Fuel),
+            CNG = sum(C.Natural.Gas),
+            Gasoline = sum(Gasoline),
+            Bio.Diesel = sum(Bio.Diesel),
+            All.Electric = sum(Electric.Battery),
+            Hybrid = sum(Electric.Propulsion),
+            Hydrogen = sum(Hydrogen),
+            LNG = sum(Liquified.Nat.Gas))
+
+energy[is.na(energy)] <- 0
+
+head(energy)
+```
+
+#### Lastly, I wanted to see the total consumpution by fuel type across all agencies countrywide. The only problem is the unit of measurement. I could not find a key on the FTA website to determine if for example the consumption in diesel was in gallons, or the batter electric in kw/hrs. The largest number was the Hybrid, which common sense would tell you it cannot be the same unit of measurement as diesel.
+```{r}
+Total.Consumption <- energy %>% 
+  summarise(Diesel = sum(Diesel),
+            CNG = sum(CNG),
+            Gasoline = sum(Gasoline),
+            Bio.Diesel = sum(Bio.Diesel),
+            All.Electric = sum(All.Electric),
+            Hybrid = sum(Hybrid),
+            Hydrogen = sum(Hydrogen),
+            LNG = sum(LNG))
+
+Total.Consumption
+```
+
+
+#### This tidying felt pretty clean and I felt the need to write it to csv. 
+```{r}
+write.csv(energy, "Transit_Energy.csv", row.names = FALSE)
+```
+
+
+
+

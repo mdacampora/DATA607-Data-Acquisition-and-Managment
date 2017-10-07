@@ -1,0 +1,98 @@
+---
+title: "Project 2 - Dataset 3"
+author: "Michael D'Acampora"
+date: "October 7, 2017"
+output: html_document
+---
+
+### This dataset #3 is 25 years worth of catfish stocks
+```{r}
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+data3 <- read.csv("CatfishFarm.csv", header=FALSE)
+head(data3)
+```
+
+#### Drop the first row, and tidy by using rename and gather. There was an issue with this data set regarding column names and I felt this was the best way to do it.
+```{r}
+data3 <- data3[-c(1), ]
+
+# tidy up: rename and gather
+catfish <- data3 %>% 
+  rename("Category"=V1,
+         "1992"=V2,
+         "1993"=V3,
+         "1994"=V4,
+         "1995"=V5,
+         "1996"=V6,
+         "1997"=V7,
+         "1998"=V8,
+         "1999"=V9,
+         "2000"=V10,
+         "2001"=V11,
+         "2002"=V12,
+         "2003"=V13,
+         "2004"=V14,
+         "2005"=V15,
+         "2006"=V16,
+         "2007"=V17,
+         "2008"=V18,
+         "2009"=V19,
+         "2010"=V20,
+         "2011"=V21,
+         "2012"=V22,
+         "2013"=V23,
+         "2014"=V24,
+         "2015"=V25,
+         "2016"=V26) %>% 
+  
+  gather(-Category, key = "Year", value = "Stock")
+
+head(catfish)
+```
+
+#### remove the commas from Stock so they will sum together, and compare stock by size/category
+```{r}
+
+catfish$Category <- gsub("/","", catfish$Category)
+catfish$Stock <- as.numeric(gsub(",", "", catfish$Stock))
+
+Stock.by.Size <- catfish %>% 
+  
+  select(Category, Stock) %>% 
+  
+  group_by(Category) %>% 
+  
+  summarise(Stock.by.Category = sum(Stock))
+
+head(Stock.by.Size)
+```
+
+####  compare stock by year
+```{r}
+Stock.by.year <- catfish %>% 
+  
+  select(Year, Stock) %>% 
+  
+  group_by(Year) %>% 
+  
+  summarise(Stock = sum(Stock))
+
+head(Stock.by.year)
+```
+
+
+
+#### Plot the stock by year. As you can see, catfish stockpiles have been on a downward trend since 2008. Could there be a connection with the 2008 financial crisis? Or maybe overfishing is making catfish a more popular item on the menu?
+```{r}
+ggplot(Stock.by.year,mapping = aes(Year, Stock)) +
+  geom_bar(stat = 'identity')
+```
+
+
+
+
+

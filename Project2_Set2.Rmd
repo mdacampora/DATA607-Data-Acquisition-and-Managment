@@ -1,0 +1,121 @@
+---
+title: "Project 2 Dataset 2"
+author: "Michael D'Acampora"
+date: "October 7, 2017"
+output: html_document
+---
+
+### This dataset is based on approximately the last 5 years of NYPD motor vehicle collisions in New York City. 
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+data2 <- read.csv("NYPD_Motor_Vehicle_Collisions.csv")
+head(data2)
+
+```
+
+#### checking the data types
+```{r}
+sapply(data2, mode)
+sapply(data2, class)
+```
+
+
+
+#### select the relvant variables, clean up the column names 
+```{r}
+Accidents <- data2 %>% 
+  select(DATE,
+         TIME,
+         BOROUGH, 
+         ZIP.CODE,
+         NUMBER.OF.PERSONS.INJURED,
+         NUMBER.OF.PERSONS.KILLED,
+         NUMBER.OF.PEDESTRIANS.INJURED,
+         NUMBER.OF.PEDESTRIANS.KILLED,
+         NUMBER.OF.CYCLIST.INJURED,
+         NUMBER.OF.CYCLIST.KILLED,
+         NUMBER.OF.MOTORIST.INJURED,
+         NUMBER.OF.MOTORIST.KILLED,
+         CONTRIBUTING.FACTOR.VEHICLE.1,
+         CONTRIBUTING.FACTOR.VEHICLE.2,
+         VEHICLE.TYPE.CODE.1,
+         VEHICLE.TYPE.CODE.2) %>% 
+
+  rename('PERS.INJ'    = NUMBER.OF.PERSONS.INJURED,
+         'PERS.KILLED' = NUMBER.OF.PERSONS.KILLED,
+         'PED.INJ'     = NUMBER.OF.PEDESTRIANS.INJURED,
+         'PED.KILLED'  = NUMBER.OF.PEDESTRIANS.KILLED,
+         'CYC.INJ'     = NUMBER.OF.CYCLIST.INJURED,
+         'CYC.KILLED'  = NUMBER.OF.CYCLIST.KILLED,
+         'MOT.INJ'     = NUMBER.OF.MOTORIST.INJURED,
+         'MOT.KILLED'  = NUMBER.OF.MOTORIST.KILLED)
+
+head(Accidents)
+
+```
+
+
+#### Build a new table grouped by borough
+```{r}
+By.Borough <- Accidents %>% 
+  select(BOROUGH, 
+         PERS.INJ,
+         PERS.KILLED,
+         PED.INJ,
+         PED.KILLED,
+         CYC.INJ,
+         CYC.KILLED,
+         MOT.INJ,
+         MOT.KILLED) %>% 
+  
+  group_by(BOROUGH) %>% 
+  
+  summarise(TOTAL.INJ    = sum(PERS.INJ),
+            TOTAL.KILLED = sum(PERS.KILLED),
+            PED.INJ      = sum(PED.INJ),
+            PED.KILLED   = sum(PED.KILLED),
+            CYC.INJ      = sum(CYC.INJ),
+            CYC.KILLED   = sum(CYC.KILLED),
+            MOT.INJ      = sum(MOT.INJ),
+            MOT.KILLED   = sum(MOT.KILLED)) 
+  
+
+By.Borough
+```
+
+
+
+#### Plot the total killed by borough. There is a huge contingent of empty borough data. The zipcode data was also empty. It seems the onlyi thing you could do is figure out a way to map the GPS data to the relevant borough to fill in the raw data. 
+```{r}
+ggplot(By.Borough,mapping = aes(BOROUGH, TOTAL.KILLED)) +
+  geom_bar(stat = 'identity')
+
+```
+
+
+
+#### Compare total injured by zip code, drop the NA rows
+```{r}
+By.Zip <- Accidents %>% 
+  select(ZIP.CODE,
+         PERS.INJ,
+         PERS.KILLED) %>% 
+  
+  group_by(ZIP.CODE) %>% 
+  
+  summarise(Total.Injured = sum(PERS.INJ),
+            Total.Killed  = sum(PERS.KILLED)) %>% 
+  
+  drop_na(ZIP.CODE)
+
+# get summary data for total injured and total killed
+summary(By.Zip$Total.Injured)
+summary(By.Zip$Total.Killed)
+
+```
+
+
+
